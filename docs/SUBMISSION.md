@@ -16,7 +16,7 @@ A shopkeeper starts with one to three cultural anchors: a film, book, TV show, o
 
 The shopkeeper can inspect the evidence behind each selection, see why other records were excluded, compare the edit with simple stock-age and gross-profit baselines, and review a transparent one-unit-of-each financial scenario. The agent prepares editable collection copy. The owner chooses whether to publish it.
 
-Publishing creates a customer page with current availability and free pickup holds. The shop supplies pickup instructions before publishing. A hold reserves one unit immediately and expires after 48 hours, with expiry reconciled when the app next handles a request. The shopkeeper can mark it collected or cancel it to restore that unit. Side B takes no payment. Owners can print shelf cards and export the full decision receipt.
+Publishing creates a customer page with current availability and free pickup holds. Owners can pause and resume a campaign’s public link while preserving existing holds. The shop supplies pickup instructions before publishing. A hold reserves one unit immediately and expires after 48 hours, with expiry reconciled when the app next handles a request. The shopkeeper can mark it collected or cancel it to restore that unit. Side B takes no payment. Owners can print shelf cards and export the full decision receipt.
 
 The app includes an end-to-end private guest demo, account sign-in through ChatGPT, inventory editing, and CSV import/export for up to 50 titles. The sample inventory uses real artists with illustrative stock, pricing, and shelf ages. Campaigns preserve the sample-data label from publication. Guest and signed-in accounts are separate workspaces.
 
@@ -32,7 +32,7 @@ Qloo's raw affinities are retained separately. Because those scores are normaliz
 
 Side B uses Next.js and TypeScript, a persistent SQL database through Drizzle, and server-side Qloo API calls. The agent verifies cultural identities, resolves stocked artists, queries Qloo with a stock-constrained candidate set, combines cultural ranks, enforces commercial constraints, and prepares a publishable collection with a decision trail.
 
-The workflow uses deterministic orchestration and selection. It does not depend on a language model to invent product matches or financial claims. Unresolved artists remain in inventory but receive no invented affinity. If too few records satisfy the brief, Side B returns fewer picks with an explanation instead of silently relaxing constraints.
+The workflow uses deterministic orchestration and selection. No LLM is used. The tool interface is documented in [`docs/agent-tool.schema.json`](agent-tool.schema.json). Unresolved artists remain in inventory but receive no invented affinity. If too few records satisfy the brief, Side B returns fewer picks with an explanation instead of silently relaxing constraints.
 
 Secrets stay on the server. Public storefront responses omit cost prices and private customer records. Reservation writes check availability and support idempotency. Data deletion is available in workspace settings.
 
@@ -51,7 +51,7 @@ First, validate the workflow with shopkeepers and reconcile stock against a real
 - Demo: https://side-b-records.sg127977958.chatgpt.site
 - Public repository: https://github.com/shi1720/side-b
 
-Publication and repository accessibility must be verified before submitting these links. This note belongs to the preparation document and can be removed once verified.
+The externally published demo and public MIT-licensed repository are available at these links. The repository includes a passing continuous-integration workflow.
 
 ## Credits and disclosure
 

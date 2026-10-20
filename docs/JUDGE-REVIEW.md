@@ -1,6 +1,6 @@
 # Rubric self-assessment and release gates
 
-This is an internal review, not an independent judge's score. Scores below are provisional assessments of the implementation read on October 20, 2026. External deployment and actual pilot results require separate verification. The build owner reports passing local behavior and HTTP-flow checks, plus a desktop and 390-pixel mobile browser walkthrough of exact search, generation, publication, public hold, and reference confirmation. This is not independent commercial validation.
+This is an internal review, not an independent judge's score. Scores below are provisional assessments of the implementation read on October 20, 2026. The external demo and public MIT-licensed repository are published. Actual customer pilots and commercial outcomes remain unvalidated. The build owner reports passing local behavior and HTTP-flow checks, plus a desktop and 390-pixel mobile browser walkthrough of exact search, generation, publication, public hold, and reference confirmation. This is not independent commercial validation.
 
 | Criterion | Provisional score | Evidence to show | Main gap |
 |---|---:|---|---|
@@ -23,7 +23,7 @@ This makes the cultural graph, constrained decisions, and action loop visible in
 4. Can a customer reserve stock twice? Reservation idempotency and atomic availability checks must be verified, including competing requests for the final unit.
 5. Are economics real? The arithmetic uses entered stock prices and costs. The outcome assumes one of each selected record sells and excludes overhead, fees, and tax.
 6. Has anyone paid? No traction is claimed. Pricing and pilot targets are explicit hypotheses.
-7. What makes this agentic? It performs an inspectable sequence of tool-backed identity resolution, evidence retrieval, stock analysis, selection, and preparation for a human-approved publish action. It uses deterministic orchestration rather than an LLM planner.
+7. What makes this agentic? It performs an inspectable sequence of tool-backed identity resolution, evidence retrieval, stock analysis, selection, and preparation for a human-approved publish action. It uses deterministic orchestration and no LLM. The tool schema is documented in `docs/agent-tool.schema.json`.
 
 ## Release gate
 

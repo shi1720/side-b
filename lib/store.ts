@@ -5,6 +5,7 @@ import type { AgentRun, Campaign, InventoryItem, Reservation, Workspace } from '
 import { z } from 'zod';
 import { AppError } from './errors';
 import { quota, requestIdentity } from './qloo';
+import { cancelStatements, collectStatement, expireStatements, reserveStatements, type StockStatement } from './stock-sql';
 
 export class ApiError extends AppError { constructor(status: number, message: string) { super(message, status); } }
 export function database(): D1Database {
@@ -44,7 +45,7 @@ export function json(data: unknown, cookie?: string, status = 200) {
 export function apiError(error: unknown) {
   if (error instanceof AppError) return json({ error: error.message }, undefined, error.status);
   const message = error instanceof Error ? error.message : '';
-  if (/stock unavailable|active holds|invalid reservation|invalid stock|campaign unavailable|campaign hold limit|reservation transition/i.test(message)) return json({ error: 'Stock or reservation status changed. Refresh and try again.' }, undefined, 409);
+  if (/stock unavailable|active holds|invalid reservation|invalid stock|campaign unavailable|campaign hold limit|reservation transition|UNIQUE constraint failed: inventory.owner_id, inventory.sku/i.test(message)) return json({ error: 'Stock or reservation status changed. Active holds must be collected or cancelled before replacing inventory.' }, undefined, 409);
   console.error('Workspace operation failed', error instanceof Error ? error.name : 'unknown');
   return json({ error: 'This change could not be saved. Please try again.' }, undefined, 500);
 }
@@ -68,10 +69,12 @@ export function insertInventory(db: D1Database, ownerId: string, item: Inventory
     .bind(ownerId,item.sku,item.artist,item.title,Math.round(item.price*100),Math.round(item.cost*100),item.quantity,item.daysOnShelf,item.genre,item.color || null,item.entityId || null,item.image || null);
 }
 export const SAMPLE_PICKUP = 'Demo collection only — no real stock or pickup.';
+export function prepareStockStatement(db: D1Database, statement: StockStatement) { return db.prepare(statement.sql).bind(...statement.params); }
 /** Opportunistic cleanup: no background scheduler or promised notification. */
 export async function expireHolds(ownerId: string) {
   const cutoff = new Date(Date.now()-48*60*60*1000).toISOString();
-  await database().prepare("UPDATE reservations SET status='cancelled' WHERE owner_id=? AND status='held' AND created_at < ?").bind(ownerId,cutoff).run();
+  const db = database();
+  await db.batch(expireStatements(ownerId,cutoff).map(s=>prepareStockStatement(db,s)));
 }
 export async function getWorkspaceContext(request: Request): Promise<{ ownerId: string; workspace: Workspace; cookie?: string }> {
   const user = await getChatGPTUser();
@@ -178,10 +181,7 @@ export async function reserveRecord(campaignId: string, input: { sku: string; cu
   const item = run.selected.find(v=>v.sku===input.sku);
   if (!item) throw new ApiError(400, 'This record is not in the collection.');
   const id = crypto.randomUUID(); const reference = `SB-${id.slice(0,8).toUpperCase()}`;
-  // INSERT and stock trigger form one statement. NOT EXISTS excludes duplicate
-  // requests before the BEFORE INSERT stock check, including a last-unit retry.
-  await db.prepare("INSERT INTO reservations (id,owner_id,campaign_id,sku,item_title,customer_name,quantity,status,idempotency_key,created_at,reference) SELECT ?,?,?,?,?,?,1,'held',?,?,? WHERE EXISTS (SELECT 1 FROM inventory WHERE owner_id=? AND sku=? AND artist=? AND title=? AND price_cents=?) AND NOT EXISTS (SELECT 1 FROM reservations WHERE campaign_id=? AND idempotency_key=?) ON CONFLICT(campaign_id,idempotency_key) DO NOTHING")
-    .bind(id,row.owner_id,campaignId,input.sku,item.title,input.customerName,input.idempotencyKey,new Date().toISOString(),reference,row.owner_id,input.sku,item.artist,item.title,Math.round(item.price*100),campaignId,input.idempotencyKey).run();
+  await db.batch(reserveStatements({id,ownerId:String(row.owner_id),campaignId,sku:input.sku,artist:item.artist,title:item.title,priceCents:Math.round(item.price*100),customerName:input.customerName,idempotencyKey:input.idempotencyKey,createdAt:new Date().toISOString(),reference}).map(s=>prepareStockStatement(db,s)));
   const saved = await db.prepare('SELECT * FROM reservations WHERE campaign_id=? AND idempotency_key=?').bind(campaignId,input.idempotencyKey).first<Row>();
   if (!saved) throw new ApiError(409, 'This record changed or is unavailable.');
   if (saved.sku !== input.sku || saved.customer_name !== input.customerName) throw new ApiError(409, 'This request key was already used.');
@@ -190,7 +190,8 @@ export async function reserveRecord(campaignId: string, input: { sku: string; cu
 }
 export async function transitionReservation(ownerId: string, id: string, status: 'cancelled'|'collected') {
   const db = database();
-  await db.prepare("UPDATE reservations SET status=? WHERE id=? AND owner_id=? AND status='held'").bind(status,id,ownerId).run();
+  const statements = status === 'cancelled' ? cancelStatements(ownerId,id) : [collectStatement(ownerId,id)];
+  await db.batch(statements.map(s=>prepareStockStatement(db,s)));
   const row = await db.prepare('SELECT * FROM reservations WHERE id=? AND owner_id=?').bind(id,ownerId).first<Row>();
   if (!row) throw new ApiError(404, 'Reservation not found.');
   if (row.status !== status) throw new ApiError(409, 'This reservation has already been completed.');

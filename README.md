@@ -51,7 +51,7 @@ Vinext / Cloudflare Worker
         ├── inventory-constrained planner + immutable decision receipts
         ├── ChatGPT identity / opaque guest session
         └── D1: workspaces, inventory, runs, campaigns, reservations
-                       └── SQL triggers enforce stock and transition invariants
+                       └── explicit atomic batches enforce stock and transition invariants
 ```
 
 Server source: `lib/agent.ts`, `lib/qloo.ts`, `lib/evidence.ts`, `lib/optimizer.ts`, `lib/store.ts`. API contracts: [API-CONTRACT.md](API-CONTRACT.md). UI: `app/page.tsx`, `app/c/[id]/page.tsx`, `app/globals.css`.
@@ -69,6 +69,7 @@ cp .env.example .dev.vars
 npm run build
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_spicy_magus.sql
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_spotty_black_panther.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0002_remove_legacy_triggers.sql
 npm run dev
 ```
 
