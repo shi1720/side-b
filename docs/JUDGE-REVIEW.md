@@ -1,10 +1,10 @@
 # Rubric self-assessment and release gates
 
-This is an internal review, not an independent judge's score. Scores below are provisional assessments of the implementation read on October 20, 2026. The external demo and public MIT-licensed repository are published. Actual customer pilots and commercial outcomes remain unvalidated. The build owner reports passing local behavior and HTTP-flow checks, plus a desktop and 390-pixel mobile browser walkthrough of exact search, generation, publication, public hold, and reference confirmation. This is not independent commercial validation.
+This is an internal review, not an independent judge's score. Scores below are provisional assessments of the implementation read on October 20, 2026. The external demo and public MIT-licensed repository are published. Actual customer pilots and commercial outcomes remain unvalidated. Current CI passes 27 automated tests, TypeScript checks and a production build. The hosted merchant-to-storefront HTTP smoke and browser sign-in return flow pass, and the build owner reports a desktop and 390-pixel mobile browser walkthrough of exact search, generation, publication, public hold, and reference confirmation. This is not independent commercial validation.
 
 | Criterion | Provisional score | Evidence to show | Main gap |
 |---|---:|---|---|
-| Technological implementation | 8/10 | Server-side Qloo search, stock-restricted per-anchor Insights, rank fusion, enforced constraints, persisted runs and reservation lifecycle | Complete externally hosted end-to-end QA, malformed-input and concurrency checks, account isolation |
+| Technological implementation | 8/10 | Server-side Qloo search, stock-restricted per-anchor Insights, rank fusion, enforced constraints, persisted runs and reservation lifecycle | Broader operational testing, including cross-device persistence and signed-in account isolation |
 | Design | 8/10 | A coherent shop studio, editable stock, reasons for picks, public storefront and pickup loop | Confirm mobile behavior, keyboard access, real error states, readable print output |
 | Potential impact | 7/10 | A concrete buyer and recurring merchandising task, transparent gross profit scenario, realistic pricing experiment | No retailer interviews, paid usage, or measured time savings yet |
 | Quality of idea | 8/10 | Cultural discovery constrained by sellable stock and margin, with a complete action loop | Show the cross-domain connection clearly and explain the album-level limitation |

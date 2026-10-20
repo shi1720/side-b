@@ -278,7 +278,7 @@ export default function Home() {
           {!workspace?.user && (
             <a
               className="sidebar-login"
-              href="/signin-with-chatgpt?return_to=/"
+              href="/signin-with-chatgpt?return_to=/" target="_top"
             >
               <LogIn size={14} /> Sign in with ChatGPT
             </a>
@@ -308,7 +308,7 @@ export default function Home() {
             {!workspace?.user && (
               <a
                 className="topbar-login"
-                href="/signin-with-chatgpt?return_to=/"
+                href="/signin-with-chatgpt?return_to=/" target="_top"
                 title="Sign in with ChatGPT — opens a separate account workspace"
               >
                 <LogIn size={13} />
@@ -1892,10 +1892,13 @@ export default function Home() {
                   ? "Signed in and saved to your account."
                   : "Your private guest workspace uses this browser’s cookie. Signing in opens a separate account workspace; guest data is not transferred. Sign in before uploading stock you need across devices."}
               </p>
+              {workspace.user && (
+                <a className="button secondary" href="/signout-with-chatgpt?return_to=/" target="_top">Sign out of Side B</a>
+              )}
               {!workspace.user && (
                 <a
                   className="button secondary"
-                  href="/signin-with-chatgpt?return_to=/"
+                  href="/signin-with-chatgpt?return_to=/" target="_top"
                 >
                   <LogIn size={15} />
                   Sign in with ChatGPT

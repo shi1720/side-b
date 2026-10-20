@@ -1,14 +1,16 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const base=process.argv[2]||'http://127.0.0.1:5173';
-function client(){let cookie='';return async(path,body,method=body?'POST':'GET',useOrigin=true)=>{
+function client(){const cookies=new Map();return async(path,body,method=body?'POST':'GET',useOrigin=true)=>{
+ const cookie=[...cookies].map(([k,v])=>k+'='+v).join('; ');
  const res=await fetch(base+path,{method,headers:{...(cookie?{cookie}:{}),...(body?{'content-type':'application/json'}:{}),...(useOrigin?{origin:base}:{})},...(body?{body:JSON.stringify(body)}:{})});
- if(res.headers.get('set-cookie'))cookie=res.headers.get('set-cookie').split(';')[0];
+ for(const entry of res.headers.getSetCookie()){const pair=entry.split(';')[0];const eq=pair.indexOf('=');if(eq>0){if(/max-age=0(?:;|$)/i.test(entry))cookies.delete(pair.slice(0,eq));else cookies.set(pair.slice(0,eq),pair.slice(eq+1));}}
  const data=await res.json();return {status:res.status,data};
 };}
 const a=client(),b=client();
 let r=await a('/api/workspace');assert.equal(r.status,200);assert.equal(r.data.inventory.length,20);const stock=r.data.inventory;
 assert.equal((await a('/api/workspace',{name:'Integration Test Shop'})).status,200);
+assert.equal((await a('/api/workspace')).data.name,'Integration Test Shop');
 assert.equal((await b('/api/workspace')).data.name,'Side B Records');
 assert.equal((await a('/api/workspace',{name:'Forbidden'},'POST',false)).status,403);
 assert.equal((await a('/api/inventory',{items:[{...stock[0],quantity:-1}]},'PUT')).status,400);

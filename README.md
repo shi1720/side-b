@@ -4,7 +4,7 @@
 
 A cultural merchandising tool for independent record shops, created by **Shivam Gupta** for the Qloo Agentic Hackathon 2026 with AI-assisted development.
 
-[Open the public app](https://side-b-records.sg127977958.chatgpt.site) · [Submission](docs/SUBMISSION.md) · [Founder walkthrough](docs/FOUNDER-WALKTHROUGH.md) · [Commercial plan](docs/COMMERCIAL-VALIDATION.md) · [MIT license](LICENSE)
+[Open the public app](https://side-b-records.sg127977958.chatgpt.site) · [Try a published sample collection](https://side-b-records.sg127977958.chatgpt.site/c/f2bb515f-f123-41fc-be66-067a8f798fc1) · [Submission](docs/SUBMISSION.md) · [Founder walkthrough](docs/FOUNDER-WALKTHROUGH.md) · [Commercial plan](docs/COMMERCIAL-VALIDATION.md) · [MIT license](LICENSE)
 
 ## The problem
 
