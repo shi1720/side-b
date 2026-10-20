@@ -52,10 +52,12 @@ First, validate the workflow with shopkeepers and reconcile stock against a real
 - Public repository: https://github.com/shi1720/side-b
 - Public walkthrough: https://youtu.be/5lAPCRtPbU4 (1080p playback verified; English captions published separately)
 
-The canonical app and public MIT-licensed source are linked above. [CI run 39411766884](https://github.com/shi1720/side-b/actions/runs/39411766884) passed both jobs, including all 51 tests with zero skips in the emulator run. Hosted commit `c3360dd` (revision `00006`) passed the live Qloo and pickup HTTP smoke at `2026-10-20T11:01:47.565Z`, including boot-asset checks, no-store HTML and fixture cleanup. Google sign-in and native form sign-out were verified in the browser; sign-out restored the original distinct guest workspace. Final mobile inventory containment and cross-device checks remain separate in the QA checklist.
+The canonical app and public MIT-licensed source are linked above. [CI run 39412428378](https://github.com/shi1720/side-b/actions/runs/39412428378) passed both jobs, including all 51 tests with zero skips in the emulator run. Hosted commit `d58be20` (revision `side-b-00007-mxx`) passed the live Qloo and pickup HTTP smoke at `2026-10-20T11:08:43.990Z`, including boot-asset checks, no-store HTML and fixture cleanup. Google sign-in and native form sign-out were verified in the browser; sign-out restored the original distinct guest workspace. Phone inventory containment passed at 320 and 390 pixels. Cross-device checks remain separate in the QA checklist.
 
 The correct Devpost project is `1247896` (Side B). Its four-of-five-section draft has been saved and is intentionally not submitted.
 
 ## Credits and disclosure
 
 Created by Shivam Gupta. AI-assisted research, design, implementation, and documentation. Qloo provides the cultural affinity data. Sample stock and prices are illustrative. No customer demand or performance results are fabricated.
+
+Additional verified browser checks: deployed source `d58be20`, revision `side-b-00007-mxx`, passed the hosted workflow at `2026-10-20T11:08:43.990Z`. CI run 39412428378 passed both jobs. Phone inventory containment passed 320/390px, results passed 390/768/1280px, and the 390px customer confirmation plus owner cancellation restored stock. Google re-entry restored the saved account collections. Printed shelf cards were rendered and checked. Cross-device and second-account browser checks remain unclaimed.

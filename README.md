@@ -4,7 +4,9 @@
 
 Side B is a cultural merchandising tool for independent record shops, created by **Shivam Gupta** with AI-assisted development. It connects what an audience loves to records a shop already has, then turns the selection into a shareable collection with pickup holds.
 
-[Open Side B](https://sideb-records.web.app) · [Architecture](docs/ARCHITECTURE.md) · [Deploy your own instance](docs/DEPLOYMENT.md) · [Commercial assumptions](docs/COMMERCIAL-VALIDATION.md) · [MIT license](LICENSE)
+[Open Side B](https://sideb-records.web.app) · [Watch the demo](https://www.youtube.com/watch?v=5lAPCRtPbU4) · [Architecture](docs/ARCHITECTURE.md) · [Deploy your own instance](docs/DEPLOYMENT.md) · [Commercial assumptions](docs/COMMERCIAL-VALIDATION.md) · [MIT license](LICENSE)
+
+![Side B studio](docs/assets/studio.png)
 
 ## Why it exists
 
