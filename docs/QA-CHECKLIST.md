@@ -2,7 +2,7 @@
 
 Canonical target: [sideb-records.web.app](https://sideb-records.web.app).
 
-**Current migration status:** all 51 unique active tests passed together against the Firestore emulator with Node.js 24.22, with zero skips: 41 module/security/session/agent cases and ten Firestore integration cases. A first Firebase-hosted HTTP smoke also passed at `2026-10-20T10:15:58Z`. Google sign-in was subsequently verified in the hosted browser through the Google account chooser and redirect back to a saved account workspace on the latest image. Final release HTTP smoke and restoration of the retained guest workspace are tracked separately below.
+**Verified release evidence:** commit `c3360dd`, deployed Cloud Run revision `00006`, passed the hosted HTTP smoke at `2026-10-20T11:01:47.565Z`. The 15.67-second workflow verified no-store HTML, successful browser boot assets, live Qloo, the pickup lifecycle and fixture cleanup. [GitHub CI run 39411766884](https://github.com/shi1720/side-b/actions/runs/39411766884) passed both jobs; the complete emulator run passed all 51 tests with zero skips. Hosted Google sign-in and native form sign-out were verified, including restoration of the original guest workspace. The final 390-pixel overflow recheck remains pending.
 
 This checklist separates current implementation tests from earlier hosting-platform results. A checked automated gate applies only to the behavior its test exercises. It does not imply every UI or deployed configuration has been checked.
 
@@ -19,7 +19,7 @@ This checklist separates current implementation tests from earlier hosting-platf
 
 The Firestore suite was reported passing 10/10 against `127.0.0.1:8085`, project `demo-side-b-audit`, database `side-b`. Its fixture guard requires a `demo-` project and an emulator. Its current cases also cover operational-entry TTL cleanup/reset and migration of the legacy sample pickup sentinel. These checks target the current persistence layer; the removed SQLite tests are not counted as Firestore evidence.
 
-The CI workflow defines a module/type/build job and a separate complete-suite job using Node.js 24.22, Java 21 and pinned Firebase CLI 15.34.0. The latter launches an isolated `demo-side-b-ci` Firestore emulator and executes `npm test` without production credentials. Workflow configuration is not a claim that a particular remote CI run has passed.
+The CI workflow defines a module/type/build job and a separate complete-suite job using Node.js 24.22, Java 21 and pinned Firebase CLI 15.34.0. The latter launches an isolated `demo-side-b-ci` Firestore emulator and executes `npm test` without production credentials. [CI run 39411766884](https://github.com/shi1720/side-b/actions/runs/39411766884) completed both jobs successfully; its emulator job passed all 51 cases with zero skips.
 
 ## Reproduce the checks
 
@@ -51,15 +51,15 @@ The HTTP smoke creates and deletes its own guest fixtures and consumes upstream 
 
 Record the deployment revision, origin, command result and evidence artifact for the current revision.
 
-- [x] Native Next.js build completed for a deployed image; final image publication is tracked separately.
+- [x] Native Next.js production build deployed as revision `00006` from `c3360dd`.
 - [x] Canonical Firebase Hosting URL opens without private access, verified by the build owner.
-- [x] First migrated hosted live Qloo search and stock-constrained planning complete; rerun after final image.
-- [ ] Final-image merchant-to-public pickup smoke passes, including fixture cleanup, no-store HTML and boot-asset status 200.
+- [x] Hosted live Qloo search and stock-constrained planning passed on revision `00006`.
+- [x] Revision `00006` merchant-to-public pickup smoke passed, including fixture cleanup, no-store HTML and boot-asset status 200.
 - [ ] Public code repository and recognized MIT license are accessible while signed out.
 - [ ] Secrets scan excludes Qloo keys, service-account keys and session tokens from source, bundles, screenshots, receipts and documents.
 - [ ] Runtime origin, named database, service account and Secret Manager version match the canonical deployment.
 - [ ] Public Firestore browser rules deny direct reads and writes.
-- [ ] Current remote CI completes the new module/type/build job and complete-suite Firestore emulator job.
+- [x] Current remote CI completed both the module/type/build and complete-suite Firestore emulator jobs: [run 39411766884](https://github.com/shi1720/side-b/actions/runs/39411766884).
 
 ## Google authentication and guest return
 
@@ -67,13 +67,13 @@ These use the deployed Firebase configuration. The build owner verified the comp
 
 - [x] Same-tab Google redirect opens account selection and returns to an authenticated saved account workspace, verified by the build owner.
 - [ ] Redirect cancellation, provider configuration failure and failed session verification display a useful retry message.
-- [ ] A guest workspace and account workspace remain distinct.
-- [ ] Signing out restores the same browser's original guest inventory and collections when its token was retained.
+- [x] Guest and account workspaces remained distinct in the hosted browser: the account had two collections; the original guest had zero.
+- [x] Native form sign-out restored the original guest workspace named `SideBGuestQA`, with zero collections, as verified by the build owner.
 - [ ] Signing in again restores the same account data.
 - [ ] A different Google account cannot access the first account's private stock, runs or customer holds.
 - [ ] Account data persists in another authorized browser/device after authentication.
 - [ ] Session cookies are HttpOnly and Secure in production; expired/invalid account tokens do not become authenticated access.
-- [ ] Native form sign-out works before client hydration and has a distinct outcome from workspace deletion.
+- [x] Native server-form sign-out succeeded in the hosted browser and returned to the retained guest workspace without deleting the account workspace.
 
 ## Merchant workflow
 
@@ -117,17 +117,26 @@ These use the deployed Firebase configuration. The build owner verified the comp
 
 ## Verification ledger
 
-| Environment                                  | Check                                                                           | Current status                                                                                |
-| -------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Current source, complete emulator run        | 51 unique cases: 41 module/security/session/agent and ten Firestore integration | Passed together, zero skips, Node.js 24.22; reported by build owner                           |
-| Current source, Firestore integration subset | Ten persistence/concurrency/cleanup cases                                       | Passed 10/10; included in the complete run                                                    |
-| Current source, TypeScript                   | Typechecking                                                                    | Passed, reported by implementation agent; rerun after final edits                             |
-| Native Next.js / Firebase Hosting            | First migrated public HTTP smoke and cleanup                                    | Passed at `2026-10-20T10:15:58Z`; evidence: `outputs/submission-kit/evidence/firebase-first/` |
-| Final Firebase release                       | Public HTTP smoke after final image publication                                 | Pending final revision evidence                                                               |
-| Firebase Google auth                         | Same-tab Google chooser and redirect into saved account workspace               | Passed in hosted browser on latest image, reported by build owner                             |
-| Retained guest return                        | Native sign-out and original guest restoration                                  | In progress; not yet claimed                                                                  |
-| Current UI / desktop and mobile              | Final post-migration walkthrough and print output                               | Pending browser evidence                                                                      |
-| Commercial validation                        | Merchant interviews, paid pilots, sales uplift                                  | Not performed; no traction claim                                                              |
+| Environment                                  | Check                                                                                    | Current status                                                                                |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Current source, complete emulator run        | 51 unique cases: 41 module/security/session/agent and ten Firestore integration          | Passed together, zero skips, Node.js 24.22; reported by build owner                           |
+| Current source, Firestore integration subset | Ten persistence/concurrency/cleanup cases                                                | Passed 10/10; included in the complete run                                                    |
+| Current source, TypeScript                   | Typechecking                                                                             | Passed, reported by implementation agent; rerun after final edits                             |
+| Native Next.js / Firebase Hosting            | First migrated public HTTP smoke and cleanup                                             | Passed at `2026-10-20T10:15:58Z`; evidence: `outputs/submission-kit/evidence/firebase-first/` |
+| Hosted commit `c3360dd`, revision `00006`    | HTML/boot assets, live Qloo, pickup lifecycle and fixture cleanup                        | Passed at `2026-10-20T11:01:47.565Z`; 15.67 seconds for the complete workflow                 |
+| Firebase Google auth                         | Same-tab Google chooser and redirect into saved account workspace                        | Passed in hosted browser on latest image, reported by build owner                             |
+| Retained guest return                        | Native server-form sign-out restored `SideBGuestQA`; guest zero collections, account two | Passed in hosted browser, reported by build owner                                             |
+| Mobile inventory, 390 pixels                 | Recheck document overflow after positioned-scroll-container fix                          | Pending final browser recheck; no complete mobile pass claimed                                |
+| Commercial validation                        | Merchant interviews, paid pilots, sales uplift                                           | Not performed; no traction claim                                                              |
+
+## Video and submission status
+
+- [x] [Public walkthrough](https://youtu.be/5lAPCRtPbU4) published; 1080p playback verified by the build owner.
+- [x] English captions published separately for the video.
+- [x] Correct Devpost project `1247896` (Side B) saved as a draft at four of five sections.
+- [ ] Final Devpost submission. The draft is intentionally not submitted.
+
+The complete hosted smoke duration is a multi-request workflow measurement, not an uncached agent-latency or sales-performance benchmark. Cross-device persistence, a second Google account isolation check and the final mobile inventory containment check remain unclaimed.
 
 ## Historical checks
 

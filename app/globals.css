@@ -1626,6 +1626,8 @@ main#main-content {
   padding: 8px 10px;
 }
 .table-container {
+  /* Keep absolutely positioned accessible captions inside the scroller too. */
+  position: relative;
   /* The table's intrinsic width belongs to this scroller, never the page. */
   width: 100%;
   max-width: 100%;

@@ -50,8 +50,11 @@ First, validate the workflow with shopkeepers and reconcile stock against a real
 
 - Demo: https://sideb-records.web.app
 - Public repository: https://github.com/shi1720/side-b
+- Public walkthrough: https://youtu.be/5lAPCRtPbU4 (1080p playback verified; English captions published separately)
 
-The canonical app and public MIT-licensed source are linked above. Current automated regression evidence includes 51 unique passing cases: 41 module/security/session/agent tests and ten Firestore integration tests, run together with zero skips. The first Firebase-hosted HTTP smoke passed at `2026-10-20T10:15:58Z`; hosted Google redirect sign-in also passed. Final-image smoke and original guest restoration are recorded separately in the QA checklist. Earlier platform checks are historical.
+The canonical app and public MIT-licensed source are linked above. [CI run 39411766884](https://github.com/shi1720/side-b/actions/runs/39411766884) passed both jobs, including all 51 tests with zero skips in the emulator run. Hosted commit `c3360dd` (revision `00006`) passed the live Qloo and pickup HTTP smoke at `2026-10-20T11:01:47.565Z`, including boot-asset checks, no-store HTML and fixture cleanup. Google sign-in and native form sign-out were verified in the browser; sign-out restored the original distinct guest workspace. Final mobile inventory containment and cross-device checks remain separate in the QA checklist.
+
+The correct Devpost project is `1247896` (Side B). Its four-of-five-section draft has been saved and is intentionally not submitted.
 
 ## Credits and disclosure
 
