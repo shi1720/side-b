@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Brand, Sleeve } from "@/components/brand";
 import { useModal } from "@/components/use-modal";
+import { clientApi } from "@/components/client-api";
 import type { Campaign, InventoryItem } from "@/lib/types";
 type PublicData = {
   campaign: Campaign;
@@ -35,26 +36,19 @@ export default function CampaignPage() {
   const [reference, setReference] = useState("");
   const [key, setKey] = useState("");
   const [holdError, setHoldError] = useState("");
+  const [refreshWarning, setRefreshWarning] = useState("");
   useModal(!!selected, () => {
     if (!busy) setSelected(null);
   });
   async function load() {
-    const r = await fetch(`/api/campaigns/${id}`);
-    const d = (await r.json()) as PublicData & { error?: string };
-    if (!r.ok) throw new Error(d.error || "This shop edit could not be found.");
-    setData(d);
+    const next = await clientApi<PublicData>(`/api/campaigns/${id}`);
+    setData(next);
   }
   useEffect(() => {
     let active = true;
-    fetch(`/api/campaigns/${id}`)
-      .then(async (r) => {
-        const d = (await r.json()) as PublicData & { error?: string };
-        if (!r.ok)
-          throw new Error(d.error || "This shop edit could not be found.");
-        return d;
-      })
-      .then((d) => {
-        if (active) setData(d);
+    clientApi<PublicData>(`/api/campaigns/${id}`)
+      .then((next) => {
+        if (active) setData(next);
       })
       .catch((e) => {
         if (active) setError(e.message);
@@ -63,6 +57,10 @@ export default function CampaignPage() {
       active = false;
     };
   }, [id]);
+  useEffect(() => {
+    if (reference)
+      document.querySelector<HTMLElement>(".hold-success")?.focus();
+  }, [reference]);
   const money = (n: number) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -74,31 +72,35 @@ export default function CampaignPage() {
     setBusy(true);
     setHoldError("");
     try {
-      const r = await fetch(`/api/campaigns/${id}/reserve`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const response = await clientApi<{ reservation: { reference: string } }>(
+        `/api/campaigns/${id}/reserve`,
+        "POST",
+        {
           sku: selected.sku,
           customerName: name.trim(),
           quantity: 1,
           idempotencyKey: key,
-        }),
-      });
-      const d = (await r.json()) as {
-        error?: string;
-        reservation: { reference: string };
-      };
-      if (!r.ok) throw new Error(d.error || "Unable to reserve this record.");
-      setReference(d.reservation.reference);
-      await load();
+        },
+      );
+      setReference(response.reservation.reference);
+      // A successful hold stays successful even if the availability refresh fails.
+      void load().catch(() =>
+        setRefreshWarning(
+          "Your hold is confirmed. Availability could not refresh, so reload the page before choosing another record.",
+        ),
+      );
     } catch (e) {
       setHoldError(e instanceof Error ? e.message : "Please try again.");
+      void load().catch(() => undefined);
     } finally {
       setBusy(false);
     }
   }
   return (
     <div className="storefront">
+      <a className="skip-link" href="#store-content">
+        Skip to the records
+      </a>
       <header className="store-header">
         <Brand small />
         <span>INDEPENDENT TASTE. A NEW CONNECTION.</span>
@@ -108,22 +110,45 @@ export default function CampaignPage() {
         </Link>
       </header>
       {error ? (
-        <main className="store-error">
+        <main id="store-content" tabIndex={-1} className="store-error">
           <Disc3 size={40} />
           <h1>This record isn’t spinning.</h1>
-          <p>{error}</p>
+          <p role="alert">{error}</p>
+          <button
+            className="button secondary"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await load();
+                setError("");
+              } catch (e) {
+                setError(e instanceof Error ? e.message : "Please try again.");
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            {busy ? "Trying again…" : "Try again"}
+          </button>
           <Link className="button primary" href="/">
             Visit Side B<ArrowUpRight size={16} />
           </Link>
         </main>
       ) : !data ? (
-        <div className="loading-state">
+        <main
+          id="store-content"
+          tabIndex={-1}
+          className="loading-state"
+          role="status"
+          aria-live="polite"
+        >
           <Disc3 className="spin" size={40} />
           <h1>Digging out the good stuff.</h1>
-        </div>
+        </main>
       ) : (
         <>
-          <main>
+          <main id="store-content" tabIndex={-1}>
             <section className="store-hero">
               <div className="eyebrow">
                 <span />
@@ -177,7 +202,10 @@ export default function CampaignPage() {
                 Reserve online · Collect in store
               </span>
             </div>
-            <section className="store-records">
+            <section
+              className="store-records"
+              aria-label="Records in this shop edit"
+            >
               {data.campaign.run.selected.map((item, i) => {
                 const stock = data.inventory.find((x) => x.sku === item.sku);
                 const quantity = stock?.quantity || 0;
@@ -209,10 +237,16 @@ export default function CampaignPage() {
                       <button
                         className="button primary"
                         disabled={!quantity}
+                        aria-label={
+                          quantity
+                            ? `Hold ${item.title} by ${item.artist} for pickup`
+                            : `${item.title} is currently unavailable`
+                        }
                         onClick={() => {
                           setSelected(item);
                           setName("");
                           setReference("");
+                          setRefreshWarning("");
                           setHoldError("");
                           setKey(crypto.randomUUID());
                         }}
@@ -289,6 +323,7 @@ export default function CampaignPage() {
             <button
               className="modal-close"
               aria-label="Close pickup hold"
+              disabled={busy}
               onClick={() => {
                 if (!busy) setSelected(null);
               }}
@@ -296,7 +331,12 @@ export default function CampaignPage() {
               <X size={20} />
             </button>
             {reference ? (
-              <div className="hold-success">
+              <div
+                className="hold-success"
+                tabIndex={-1}
+                role="status"
+                aria-live="polite"
+              >
                 <CheckCircle2 size={44} />
                 <span className="eyebrow">IT HAS YOUR NAME ON IT</span>
                 <h2 id="hold-title">
@@ -324,6 +364,9 @@ export default function CampaignPage() {
                   {data?.shop.sample &&
                     "This is a sample hold only; no physical record will be supplied."}
                 </p>
+                {refreshWarning && (
+                  <p className="alert alert-warning">{refreshWarning}</p>
+                )}
                 <button
                   className="button primary"
                   onClick={() => setSelected(null)}
@@ -382,7 +425,7 @@ export default function CampaignPage() {
                     ) : (
                       <ShieldCheck size={17} />
                     )}
-                    Reserve one copy — free
+                    Reserve one copy for free
                   </button>
                   <p className="run-note">
                     One copy held for 48 hours. Pay and collect in store. No

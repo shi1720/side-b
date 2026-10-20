@@ -2,114 +2,133 @@
 
 **Your best unsold record hasn’t met its listener yet.**
 
-A cultural merchandising tool for independent record shops, created by **Shivam Gupta** for the Qloo Agentic Hackathon 2026 with AI-assisted development.
+Side B is a cultural merchandising tool for independent record shops, created by **Shivam Gupta** with AI-assisted development. It connects what an audience loves to records a shop already has, then turns the selection into a shareable collection with pickup holds.
 
-[Open the public app](https://side-b-records.sg127977958.chatgpt.site) · [Try a published sample collection](https://side-b-records.sg127977958.chatgpt.site/c/f2bb515f-f123-41fc-be66-067a8f798fc1) · [Submission](docs/SUBMISSION.md) · [Founder walkthrough](docs/FOUNDER-WALKTHROUGH.md) · [Commercial plan](docs/COMMERCIAL-VALIDATION.md) · [MIT license](LICENSE)
+[Open Side B](https://sideb-records.web.app) · [Architecture](docs/ARCHITECTURE.md) · [Deploy your own instance](docs/DEPLOYMENT.md) · [Commercial assumptions](docs/COMMERCIAL-VALIDATION.md) · [MIT license](LICENSE)
 
-## The problem
+## Why it exists
 
-A shop already paid for the records on its shelves. Its inventory system knows their cost and age, but cannot tell it which overlooked record might resonate with fans of a film, book or artist. A generic recommendation list often contains stock it does not have.
+A shop’s inventory system knows what a record costs and how long it has been on the shelf. It does not know which overlooked record might resonate with fans of a film, book or artist. A generic recommendation list can suggest records the shop cannot sell.
 
-Side B turns an audience’s cultural anchors into a small collection **from actual available inventory**, protects the shop’s economics, and publishes a storefront with free pickup holds. The starting inventory contains real release names and **fictional quantities, costs and prices**. Demo holds do not reserve real-world records.
+Side B starts with actual available inventory. Qloo supplies cross-domain cultural connections; the planner applies the shop’s price, gross-margin and stock constraints. Every selection keeps its evidence. The merchant reviews the result, edits the story and decides whether to publish.
 
-## Try it in two minutes
+The starting stock uses real artists and releases with **illustrative prices, costs and quantities**. Sample pickup holds demonstrate the workflow; they do not reserve physical records.
 
-1. Open the app; a private guest workspace needs no login.
+## Try the complete workflow
+
+1. [Open the studio](https://sideb-records.web.app). A private guest workspace needs no sign-in.
 2. Choose **The Past Lives crowd**, then select the exact film returned by Qloo.
-3. Keep the four-record/$40/30% gross-margin defaults and click **Build my shop edit**.
-4. Open **Why this record**, the decision trail and excluded-stock panel. Compare with the oldest-stock and contribution baselines.
-5. Edit the title/story, then **Publish shop edit**. Open the public collection and make a sample hold using a test name.
-6. Return to **Campaigns**, refresh holds, then mark it collected or cancel it. Available stock changes safely.
+3. Keep four records, a maximum price of $40 per record and a 30% minimum gross margin. Select **Build my shop edit**.
+4. Open **Why this record**, the decision trail and the excluded-stock panel. Compare the edit with the oldest-stock and highest-margin baselines.
+5. Edit the title and story, then select **Publish shop edit**. Open the public collection and create a sample hold using a test name.
+6. Return to **Campaigns**, refresh holds and mark it collected or cancel it. Cancellation restores the available copy once.
+7. Pause the public collection to stop new holds. Existing holds remain manageable. Resume it when ready.
 
-Try a second anchor or a different film. These are live API queries, with durable caching clearly labeled. No score or selection is hardcoded. Cached artist IDs for the supplied stock were resolved against Qloo on 20 October 2026; an unrecognized artist is never assigned a fabricated ID.
+Search and planning use the live Qloo API with timestamped caching. The app does not substitute fabricated results when Qloo is unavailable. Selecting another cultural anchor can change the edit; a live controlled comparison with identical stock and constraints changed two of four selections between Past Lives and Khruangbin. This demonstrates an effect on selection, not an improvement in sales.
 
-**Sign in with ChatGPT** enables a durable account workspace across browsers. Guest and account workspaces are separate; sign-in does not transfer guest work. Guest sessions use an opaque HttpOnly cookie. For real stock, import the CSV and enter your shop’s pickup instructions in settings before publication.
+**Google sign-in uses a same-tab redirect and opens a separate account workspace.** Guest data is not transferred. Sign out to return to this browser’s guest workspace. Export inventory and decision receipts for a portable copy of important work. Clearing browser cookies removes access to an anonymous workspace; use an account for ongoing shop operations.
 
 ## What makes it Qloo-powered
 
-| Tool step | Implementation |
-|---|---|
-| Resolve audience | `/search` with typed artist/movie/book/TV requests; the selected ID is verified again server-side. |
-| Inspect stock | Resolve stocked artists exactly; up to 50SKUs; aliases sharing one verified artist ID count as one artist. |
-| Query cultural affinity | `/v2/insights` with the audience as `signal.interests.entities`, `filter.type=urn:entity:artist`, and **`filter.results.entities` restricted to stocked artists**. |
-| Attribute multiple anchors | A joint audience query retains Qloo’s native input contribution where available. Missing attribution remains unknown. |
-| Fuse evidence | Within-pool rank scores are averaged across anchors. Raw Qloo affinities are retained separately, never averaged. Missing evidence contributes zero. |
-| Choose an edit | Hard stock, per-record price, gross-margin, collection-size and minimum-fit constraints; at most one release per resolved artist. A bounded preference favors older stock. |
-| Execute | Publish an immutable collection, create an atomic inventory hold, then record collection/cancellation. |
+| Step                      | Actual behavior                                                                                                                                                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resolve an audience       | Search Qloo for a film, book, TV show or artist. The selected entity is verified again on the server.                                                                                                       |
+| Inspect stock             | Resolve stocked artists to verified Qloo identities. A workspace holds up to 50 SKUs.                                                                                                                       |
+| Query affinity            | Call `/v2/insights` with the audience as `signal.interests.entities`, artist results, and `filter.results.entities` restricted to stocked artists.                                                          |
+| Attribute multiple inputs | Retain Qloo’s native joint-input contribution when available. Missing attribution remains unknown.                                                                                                          |
+| Fuse evidence             | Average relative rank-fit values across anchors within the stocked artist pool. Missing affinity evidence contributes zero; raw affinity values remain separate.                                            |
+| Plan an edit              | Enforce stock, per-record price, minimum gross margin, minimum rank fit and collection-size constraints. Select at most one release per resolved artist. An optional bounded preference favors older stock. |
+| Execute with oversight    | Save the decision receipt. The merchant publishes, pauses or resumes the public collection and records collection or cancellation of holds.                                                                 |
 
-This is a **deterministic, composable agentic tool**, with an explicit decision trace. It does not use or claim an LLM. Qloo supplies cultural knowledge; the constrained planner makes operational decisions; template copy remains editable. Removing Qloo leaves no cultural evidence and therefore no qualifying selections. A live controlled check with identical stock and constraints changed the four-record edit when the audience changed from Past Lives to Khruangbin; two selections differed. This establishes that cultural signals affect the decision, not that sales will improve. See [agent tool schema](docs/agent-tool.schema.json) for integration into an external agent.
+This is a deterministic, composable agentic tool with an explicit decision trail. It does not use or claim an LLM. Qloo supplies cultural evidence, the constrained planner makes operational decisions, and editable templates provide copy. See [the tool schema](docs/agent-tool.schema.json) for integration into another agent.
 
-Rank-fit is a comparative merchandising heuristic **within this shop’s resolved artist pool**, not a purchase probability or a global score. Artist affinity does not establish affinity for a particular album, pressing or condition. Upstream unknown-signal warnings and unscored generic lists are rejected. The UI reports fewer selections when the brief is infeasible, rather than silently relaxing limits.
-
-## Architecture
-
-```text
-React storefront + merchant studio
-        │ same-origin JSON APIs
-Vinext / Cloudflare Worker
-        ├── Qloo adapter: timeouts, bounded retries, durable cache, shared quotas
-        ├── inventory-constrained planner + immutable decision receipts
-        ├── ChatGPT identity / opaque guest session
-        └── D1: workspaces, inventory, runs, campaigns, reservations
-                       └── explicit atomic batches enforce stock and transition invariants
-```
-
-Server source: `lib/agent.ts`, `lib/qloo.ts`, `lib/evidence.ts`, `lib/optimizer.ts`, `lib/store.ts`. API contracts: [API-CONTRACT.md](API-CONTRACT.md). UI: `app/page.tsx`, `app/c/[id]/page.tsx`, `app/globals.css`.
-
-Reservations hold one copy. Their 48-hour expiry is processed lazily on the next workspace, collection or reservation request; cancellation releases stock exactly once. A collected hold is an operator-recorded outcome, not independently verified payment. Side B does not take payments, ship records, send email, or reconcile an external POS automatically.
+Rank fit is relative to this shop’s resolved artist pool. It is **not a purchase probability or a global score**. Artist affinity does not establish affinity for a specific album, pressing or condition. An infeasible brief returns fewer selections with warnings rather than silently relaxing constraints.
 
 ## Run locally
 
-Requires Node.js 22.16+ and npm. No Qloo key is needed for the unit/database tests. Live search and planning require a Qloo key.
+Requires **Node.js 24.12 or later**, npm, and the Firebase CLI with its supported Java runtime for the Firestore emulator. Google sign-in is optional for the guest workflow. Qloo search and planning require a server-side Qloo key.
 
 ```sh
 npm ci
-cp .env.example .dev.vars
-# Edit .dev.vars and add your own server-side QLOO_API_KEY.
-npm run build
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_spicy_magus.sql
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_spotty_black_panther.sql
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0002_remove_legacy_triggers.sql
+```
+
+Create an untracked `.env.local` file:
+
+```dotenv
+APP_ORIGIN=http://127.0.0.1:3000
+GOOGLE_CLOUD_PROJECT=demo-side-b
+FIRESTORE_DATABASE_ID=side-b
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8085
+QLOO_API_KEY=your-own-key
+QLOO_API_BASE=https://hackathon.api.qloo.com
+```
+
+In one terminal, start the local database:
+
+```sh
+npx firebase-tools emulators:start --only firestore --project demo-side-b
+```
+
+In another terminal:
+
+```sh
 npm run dev
 ```
 
-Open the printed local URL, normally `http://127.0.0.1:5173`. Apply migrations **once**, in order; do not replay them. The local D1 database is separate from the hosted database. The starter simulates sign-in only for loopback development; production uses platform authentication. A process-level `QLOO_API_KEY` is also supported for local development without a credential file.
+Open [the local studio](http://127.0.0.1:3000). Use this exact host and port so same-origin mutation checks match `APP_ORIGIN`. The local emulator contains separate data and requires no production database credentials. Do not point development or tests at the hosted database.
+
+To test Google sign-in locally, use your own Firebase project and web app configuration, enable Google as a provider, and authorize the local domain. The three web configuration variables are `FIREBASE_WEB_API_KEY`, `FIREBASE_AUTH_DOMAIN` and `FIREBASE_WEB_APP_ID`. Use the same project ID as that Firebase app. The Firestore emulator alone does not emulate Google authentication. See [deployment and authentication setup](docs/DEPLOYMENT.md).
+
+## Check the implementation
 
 ```sh
+npm run lint
 npm run typecheck
 npm test
 npm run build
-# Optional live end-to-end test (creates and deletes its own guest workspaces):
-node scripts/smoke-test.mjs http://127.0.0.1:5173
+# With the Firestore emulator running:
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8085 GOOGLE_CLOUD_PROJECT=demo-side-b-audit FIRESTORE_DATABASE_ID=side-b npm run test:firestore
+# With the app, emulator and live Qloo key configured:
+node scripts/smoke-test.mjs http://127.0.0.1:3000
 ```
 
-Tests cover cultural-evidence rejection, optimizer boundaries, price/margin constraints, missing anchors, artist diversity, exact-cent economics, no overselling, idempotency, cancellation, expiry and owner isolation. GitHub Actions runs tests, typechecking and a production build. See [QA checklist](docs/QA-CHECKLIST.md) for manual/browser cases and verification limits.
+The current regression suite has 51 unique cases: 41 module/security/session/agent cases and ten Firestore integration cases. All 51 passed together against the emulator on Node.js 24.22 with zero skips. CI includes a separate Java 21/Firestore emulator job that executes the complete suite.
 
-## Inventory CSV
+The smoke test first verifies uncached HTML and reachable browser boot assets, then creates and deletes isolated guest workspaces. It exercises live audience search, planning, publication, public redaction, reservation idempotency, stock updates, pause/resume and owner isolation. It consumes real Qloo requests. Pure module tests can run without a Qloo key. The Firestore suite refuses to run its destructive fixtures without an emulator and a `demo-` project ID. Run it against the emulator to check transaction behavior, including concurrency, idempotency, expiry, isolation and reset.
 
-Download the template from **Your inventory**. Required headers:
+A successful build is not a substitute for Google sign-in and browser testing. Use [the QA checklist](docs/QA-CHECKLIST.md) to review keyboard navigation, narrow screens, printing and external authentication after a deployment.
+
+## Import inventory
+
+Download the CSV from **Your inventory** for a template. Required columns:
 
 ```csv
 sku,artist,title,price,cost,quantity,daysOnShelf,genre
 SHOP001,Radiohead,In Rainbows,32,20,4,124,Alternative
 ```
 
-Up to 50SKUs per workspace, unique SKU, decimal currency prices with at most two places, integer quantities and shelf age. Quoted commas are supported. All stock uses the workspace currency. Set currency before publishing. Import replaces the stock list and is blocked while active holds exist. Reconcile quantities with your actual stock before using it with customers. Discogs-style exports need manual column mapping; there is no direct Discogs integration.
+Stock uses one workspace currency. Supply unique SKUs, decimal prices with at most two places, and integer quantities and shelf days. Quoted commas and doubled quotes are supported. The server validates every row. CSV exports neutralize formula-like text so merchant input is not executed as a spreadsheet formula.
 
-## Deployment and operating limits
+Import replaces all stock and is blocked while active holds exist. Add your shop address, opening hours and a contact in settings before publishing real inventory. Reconcile available units with your physical stock before sharing a collection. External exports may need column mapping; there is no direct Discogs or POS integration.
 
-The published app runs on Sites using Cloudflare Workers and D1. The tracked `.openai/hosting.json` identifies this deployment; forked deployments must obtain their **own** Site identity and runtime secrets. The source contains no API credentials. Use Sites’ source/version/deploy workflow with D1 binding `DB` and set `QLOO_API_KEY` as a secret plus `QLOO_API_BASE` as a server variable. Production migrations are applied by the platform.
+## Hosting and operational limits
 
-Server-side protections include same-origin mutations, body/field limits, owner checks, public data allowlists, atomic SQL stock checks, idempotency, signed-in/guest workspace separation, and durable API quotas. Defaults: 80 search requests/IP/hour, 15 agent runs/IP/hour, 30 new workspaces/IP/day, 10 new holds/IP/campaign/hour, 100 active holds/campaign, 250 uncached Qloo attempts/day across the demo. These are application limits, **not claimed Qloo plan entitlements**. Search results cache for 7 days; affinity responses for 24 hours. A 16-second upstream timeout and one bounded retry protect failures. Cached evidence always exposes its original timestamp.
+The canonical app is [sideb-records.web.app](https://sideb-records.web.app). Firebase Hosting forwards requests to a native Next.js Node service on Cloud Run. The server uses Firestore for private workspaces, stock, saved decisions, public collections, holds, API caching and quotas. Firebase Authentication handles Google sign-in. See [architecture](docs/ARCHITECTURE.md) and [deployment](docs/DEPLOYMENT.md) for exact boundaries.
 
-A judge can use the sample end-to-end without credentials. If a quota is exhausted or Qloo is unavailable, the app reports the problem and saved collections remain accessible; it does not substitute fabricated live data. Bring a supported Qloo license/key for continued operation after hackathon access expires. The free infrastructure tier and Qloo allowance are not assumed to be unlimited or permanent.
+Server controls include same-origin writes, body and field limits, ownership checks, public data allowlists, transactional stock changes and idempotent holds. Defaults include 80 searches per requester per hour, 15 agent runs per requester per hour, 30 new workspaces per requester per day, 10 new holds per requester and collection per hour, 100 active holds per collection and 200 per shop. At most 250 uncached Qloo attempts are allowed per UTC day for this instance. These are application limits, not Qloo plan entitlements.
 
-## Commercial hypothesis and next validation
+Search responses cache for seven days and affinity responses for 24 hours. Upstream requests time out after 16 seconds with at most one bounded retry. The trace distinguishes cached evidence from uncached queries and retains original retrieval timestamps. Infrastructure and Qloo allowances are not assumed to be unlimited or permanent.
 
-The initial buyer is an independent record-shop owner with slow-moving stock and an audience channel. A proposed $29–49/shop/month plan needs merchant interviews and paid-pilot validation; no paying customers or sales uplift are claimed. The useful outcome to test is incremental gross contribution and sell-through against matched control inventory, after the owner’s time and subscription costs. Full assumptions, competitors and experiment design are in [the commercial plan](docs/COMMERCIAL-VALIDATION.md).
+Holds reserve one copy for 48 hours. Expiry is processed lazily on a later workspace, collection or reservation request, not by an exact-time background scheduler. A merchant-recorded collection is not independently verified payment. Side B does not accept payments, ship records, send notifications or synchronize with a POS.
+
+## Commercial hypothesis
+
+The intended buyer is an independent shop owner with slow-moving stock and an audience channel. A proposed $29 to $49 per shop per month plan still requires merchant interviews and paid-pilot validation. No paying customers or sales uplift are claimed. The outcome to test is incremental gross contribution and sell-through against matched control stock, after subscription cost and the owner’s time. Assumptions and experiment design are in [the commercial plan](docs/COMMERCIAL-VALIDATION.md).
 
 ## Privacy and attribution
 
-Only selected cultural entities and stocked artist names go to Qloo. Inventory cost/quantity and customer names stay in the application database; the public API excludes costs, margins, stock age, private traces and customer names. Raw IPs are not stored in quota keys. Owners can delete their workspace in settings; this deletes its campaigns, stock, runs and customer holds. Use test names for the demo. Guest data remains private to its cookie, account data to its platform identity. There is no automatic analytics, ad targeting or third-party email integration.
+Only selected cultural entities and stocked artist identities are sent to Qloo. Customer names, stock costs and quantities stay in the application database. Public collection responses exclude private economics, stock age, decision traces and customer names. Quota identities use a hash of the trusted proxy’s requester address; raw addresses are not stored in quota keys.
 
-Original Side B source and graphic sleeve designs are MIT-licensed. Sleeve graphics are illustrative and are not original album artwork. Qloo data and APIs remain subject to their own terms; this code license does not relicense them. Third-party starter/library licenses remain with their files. Project author: Shivam Gupta.
+Owners can delete their workspace in settings, removing its collections, stock, saved runs and customer holds. Guest ownership is tied to a private cookie; account ownership is tied to a verified Firebase user. Deleting a workspace does not delete the Google or Firebase Authentication account. Public authentication configuration is not a credential for database access; browser Firestore reads and writes are denied.
+
+Original source and graphic sleeves are MIT-licensed. Sleeves are illustrative graphics, not original album artwork. The code license does not relicense Qloo data or APIs. Third-party components retain their own licenses. Project author: **Shivam Gupta**.

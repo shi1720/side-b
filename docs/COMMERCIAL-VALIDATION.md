@@ -30,14 +30,14 @@ Recruit three shops for a four-week pilot only after understanding those workflo
 
 Use comparable campaign opportunities within the same shop. Alternate Side B edits with that shop's usual curation, or randomize matched campaign slots where operationally sensible. Record price, availability, channel, exposure, seasonality, and staff involvement. A small pilot supports directional learning, not a causal revenue claim.
 
-| Question | Measure | Proposed decision rule |
-|---|---|---|
-| Does it save useful time? | Minutes from stock export to owner-approved edit | At least half of pilot shops repeat the workflow and report meaningful time saved |
-| Is the stock trustworthy? | Published items with incorrect availability | Zero oversold holds in controlled QA; investigate every pilot mismatch |
-| Do customers act? | Unique storefront visits, valid holds, collected holds | Assess collection rate and incremental gross profit against the shop's usual edits |
-| Does it help older stock? | Units collected from stock aged 90+ days | Compare against matched baseline without discounting away gross profit |
-| Will the shop pay? | Actual continuation at a stated price | Seek at least two paid continuations before assuming demand |
-| Can the service earn money? | Measured cost per run and support per shop | Positive contribution at observed usage under confirmed API terms |
+| Question                    | Measure                                                | Proposed decision rule                                                             |
+| --------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Does it save useful time?   | Minutes from stock export to owner-approved edit       | At least half of pilot shops repeat the workflow and report meaningful time saved  |
+| Is the stock trustworthy?   | Published items with incorrect availability            | Zero oversold holds in controlled QA; investigate every pilot mismatch             |
+| Do customers act?           | Unique storefront visits, valid holds, collected holds | Assess collection rate and incremental gross profit against the shop's usual edits |
+| Does it help older stock?   | Units collected from stock aged 90+ days               | Compare against matched baseline without discounting away gross profit             |
+| Will the shop pay?          | Actual continuation at a stated price                  | Seek at least two paid continuations before assuming demand                        |
+| Can the service earn money? | Measured cost per run and support per shop             | Positive contribution at observed usage under confirmed API terms                  |
 
 The thresholds above are management choices for a small pilot. They are not industry benchmarks or statistically proven targets.
 

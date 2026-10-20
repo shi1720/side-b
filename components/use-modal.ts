@@ -13,7 +13,7 @@ export function useModal(open: boolean, close: () => void) {
     const focusable = () =>
       Array.from(
         document.querySelectorAll<HTMLElement>(
-          '.modal button:not(:disabled), .modal a[href], .modal input:not([readonly]), .modal select, .modal textarea, .modal [tabindex="0"]',
+          '.modal button:not(:disabled), .modal a[href], .modal input:not([readonly]):not(:disabled), .modal select:not(:disabled), .modal textarea:not(:disabled), .modal [tabindex="0"]',
         ),
       ).filter((el) => el.offsetParent !== null);
     const frame = requestAnimationFrame(() => {
@@ -31,7 +31,11 @@ export function useModal(open: boolean, close: () => void) {
       const elements = focusable();
       const first = elements[0];
       const last = elements.at(-1);
-      if (event.shiftKey && document.activeElement === first) {
+      const dialog = document.querySelector(".modal");
+      if (!dialog?.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first)?.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last?.focus();
       } else if (!event.shiftKey && document.activeElement === last) {

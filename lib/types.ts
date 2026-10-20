@@ -1,11 +1,107 @@
-export type EntityKind = 'artist' | 'movie' | 'book' | 'tv_show';
-export type TasteEntity = { id: string; name: string; kind: EntityKind; description?: string; image?: string; disambiguation?: string };
-export type InventoryItem = { sku: string; artist: string; title: string; price: number; cost: number; quantity: number; daysOnShelf: number; genre: string; color?: string; entityId?: string; image?: string };
-export type Constraints = { count: number; maxPrice: number; minMargin: number; minFit: number; prioritizeAge: boolean };
-export type Evidence = { anchorId: string; anchorName: string; rank: number; poolSize: number; score: number | null; rankFit: number; contribution?: number; fetchedAt: string; cached: boolean };
-export type ScoredItem = InventoryItem & { fit: number; margin: number; objective: number; evidence: Evidence[]; selected: boolean; exclusion?: string };
-export type AgentStep = { tool: string; status: 'done' | 'warning'; detail: string; durationMs?: number };
-export type AgentRun = { id: string; createdAt: string; mode: 'live'; anchors: TasteEntity[]; constraints: Constraints; items: ScoredItem[]; selected: ScoredItem[]; steps: AgentStep[]; title: string; description: string; economics: { retail: number; cost: number; contribution: number; margin: number; agedUnits: number }; baseline: { oldest: string[]; margin: string[]; culturalOverlap: number }; warnings: string[]; calls: number };
-export type Campaign = { id: string; title: string; description: string; createdAt: string; published: boolean; run: AgentRun; reservations?: number; sales?: number };
-export type Reservation = { id: string; campaignId: string; sku: string; itemTitle: string; customerName: string; quantity: number; status: 'held' | 'collected' | 'cancelled'; createdAt: string; reference: string };
-export type Workspace = { name: string; pickupInstructions?: string; currency: 'USD' | 'GBP' | 'INR' | 'EUR'; inventory: InventoryItem[]; campaigns: Campaign[]; reservations: Reservation[]; user: { displayName: string; email: string } | null; sample: boolean };
+export type EntityKind = "artist" | "movie" | "book" | "tv_show";
+export type TasteEntity = {
+  id: string;
+  name: string;
+  kind: EntityKind;
+  description?: string;
+  image?: string;
+  disambiguation?: string;
+};
+export type InventoryItem = {
+  sku: string;
+  artist: string;
+  title: string;
+  price: number;
+  cost: number;
+  quantity: number;
+  daysOnShelf: number;
+  genre: string;
+  color?: string;
+  entityId?: string;
+  image?: string;
+};
+export type Constraints = {
+  count: number;
+  maxPrice: number;
+  minMargin: number;
+  minFit: number;
+  prioritizeAge: boolean;
+};
+export type Evidence = {
+  anchorId: string;
+  anchorName: string;
+  rank: number;
+  poolSize: number;
+  score: number | null;
+  rankFit: number;
+  contribution?: number;
+  fetchedAt: string;
+  cached: boolean;
+};
+export type ScoredItem = InventoryItem & {
+  fit: number;
+  margin: number;
+  objective: number;
+  evidence: Evidence[];
+  selected: boolean;
+  exclusion?: string;
+};
+export type AgentStep = {
+  tool: string;
+  status: "done" | "warning";
+  detail: string;
+  durationMs?: number;
+};
+export type AgentRun = {
+  id: string;
+  createdAt: string;
+  mode: "live";
+  anchors: TasteEntity[];
+  constraints: Constraints;
+  items: ScoredItem[];
+  selected: ScoredItem[];
+  steps: AgentStep[];
+  title: string;
+  description: string;
+  economics: {
+    retail: number;
+    cost: number;
+    contribution: number;
+    margin: number;
+    agedUnits: number;
+  };
+  baseline: { oldest: string[]; margin: string[]; culturalOverlap: number };
+  warnings: string[];
+  calls: number;
+};
+export type Campaign = {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  published: boolean;
+  run: AgentRun;
+  reservations?: number;
+  sales?: number;
+};
+export type Reservation = {
+  id: string;
+  campaignId: string;
+  sku: string;
+  itemTitle: string;
+  customerName: string;
+  quantity: number;
+  status: "held" | "collected" | "cancelled";
+  createdAt: string;
+  reference: string;
+};
+export type Workspace = {
+  name: string;
+  pickupInstructions?: string;
+  currency: "USD" | "GBP" | "INR" | "EUR";
+  inventory: InventoryItem[];
+  campaigns: Campaign[];
+  reservations: Reservation[];
+  user: { displayName: string; email: string } | null;
+  sample: boolean;
+};

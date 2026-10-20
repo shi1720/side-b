@@ -40,14 +40,14 @@ I'm Shivam Gupta. Thanks for taking Side B for a spin.
 
 ## Recording choreography
 
-| Approximate time | Show |
-|---|---|
-| 0:00-0:30 | Studio hero and sample-workspace label |
-| 0:30-0:50 | Inventory columns and CSV controls, then return to studio |
-| 0:50-1:20 | Exact cultural search match, commercial controls, build button |
-| 1:20-1:55 | Results, “Why this record”, decision trail, excluded records |
-| 1:55-2:15 | One-of-each economics and baseline comparison |
-| 2:15-2:45 | Publish, public storefront, reserve, owner pickup holds |
-| 2:45-3:00 | Studio or final deck slide while explaining pilot hypothesis |
+| Approximate time | Show                                                           |
+| ---------------- | -------------------------------------------------------------- |
+| 0:00-0:30        | Studio hero and sample-workspace label                         |
+| 0:30-0:50        | Inventory columns and CSV controls, then return to studio      |
+| 0:50-1:20        | Exact cultural search match, commercial controls, build button |
+| 1:20-1:55        | Results, “Why this record”, decision trail, excluded records   |
+| 1:55-2:15        | One-of-each economics and baseline comparison                  |
+| 2:15-2:45        | Publish, public storefront, reserve, owner pickup holds        |
+| 2:45-3:00        | Studio or final deck slide while explaining pilot hypothesis   |
 
 Allow the real run to finish. If it takes longer than the narration, record the run first and use a clearly visible cut. Do not fabricate a successful API response. A demo video is optional under the supplied guidelines; prioritize the live app.

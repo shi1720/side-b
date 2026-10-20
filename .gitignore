@@ -59,3 +59,11 @@ next-env.d.ts
 .dev.vars*
 *.tsbuildinfo
 !.env.example
+
+.firebase-web-config.json
+cloudrun-env.json
+
+# Local emulator diagnostics
+firestore-debug.log
+firebase-debug.log
+ui-debug.log

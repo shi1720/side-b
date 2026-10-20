@@ -1,2 +1,0 @@
-ALTER TABLE `campaigns` ADD `sample` integer DEFAULT 1 NOT NULL;--> statement-breakpoint
-ALTER TABLE `workspaces` ADD `pickup_instructions` text DEFAULT 'Demo collection only — no real stock or pickup.' NOT NULL;

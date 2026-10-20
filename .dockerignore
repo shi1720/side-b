@@ -1,0 +1,13 @@
+node_modules
+.next
+dist
+.git
+.wrangler
+.env*
+work
+*.zip
+*.tar.gz
+.dev.vars*
+*service-account*.json
+*credentials*.json
+.firebase-web-config.json

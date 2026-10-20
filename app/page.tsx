@@ -40,20 +40,9 @@ import type {
 import { Brand, Sleeve, VinylArt } from "@/components/brand";
 import { useModal } from "@/components/use-modal";
 import { csvFields, parseCsv, toCsv } from "@/lib/csv";
+import { clientApi as api } from "@/components/client-api";
 
 type Tab = "studio" | "inventory" | "campaigns" | "about";
-async function api<T>(url: string, method = "GET", body?: unknown): Promise<T> {
-  const res = await fetch(url, {
-    method,
-    credentials: "same-origin",
-    headers: body ? { "Content-Type": "application/json" } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const data = (await res.json()) as T & { error?: string };
-  if (!res.ok)
-    throw new Error(data.error || "Something went wrong. Please try again.");
-  return data;
-}
 function download(name: string, text: string, type = "text/plain") {
   const a = document.createElement("a");
   const url = URL.createObjectURL(new Blob([text], { type }));
@@ -170,6 +159,7 @@ export default function Home() {
     }
   }
   function select(entity: TasteEntity) {
+    if (anchors.some((a) => a.id === entity.id)) return;
     if (anchors.length >= 3) {
       setError("Choose up to three cultural anchors for a focused audience.");
       return;
@@ -191,6 +181,20 @@ export default function Home() {
     setNotice("Inventory saved. Your next edit will use this stock.");
   }
   async function runAgent() {
+    if (
+      !Number.isFinite(constraints.maxPrice) ||
+      constraints.maxPrice < 1 ||
+      constraints.maxPrice > 10000 ||
+      constraints.minMargin < 0 ||
+      constraints.minMargin > 0.95 ||
+      constraints.minFit < 0 ||
+      constraints.minFit > 1
+    ) {
+      setError(
+        "Use a price between 1 and 10,000, a margin from 0 to 95%, and cultural rank fit from 0 to 100.",
+      );
+      return;
+    }
     await perform("agent", async () => {
       const data = await api<AgentRun>("/api/agent", "POST", {
         anchors,
@@ -230,6 +234,7 @@ export default function Home() {
             <button
               key={item.id}
               className={tab === item.id ? "nav-active" : ""}
+              aria-current={tab === item.id ? "page" : undefined}
               onClick={() => {
                 setTab(item.id);
                 setError("");
@@ -259,7 +264,11 @@ export default function Home() {
             </span>
             <ArrowUpRight size={16} />
           </div>
-          <button className="shop-switch" onClick={() => setSettings(true)}>
+          <button
+            className="shop-switch"
+            aria-label="Open shop settings"
+            onClick={() => setSettings(true)}
+          >
             <span className="shop-avatar">
               {workspace?.name.slice(0, 1) || "S"}
             </span>
@@ -276,11 +285,8 @@ export default function Home() {
             <Settings2 size={15} />
           </button>
           {!workspace?.user && (
-            <a
-              className="sidebar-login"
-              href="/signin-with-chatgpt?return_to=/" target="_top"
-            >
-              <LogIn size={14} /> Sign in with ChatGPT
+            <a className="sidebar-login" href="/signin" target="_top">
+              <LogIn size={14} /> Sign in with Google
             </a>
           )}
         </div>
@@ -308,8 +314,9 @@ export default function Home() {
             {!workspace?.user && (
               <a
                 className="topbar-login"
-                href="/signin-with-chatgpt?return_to=/" target="_top"
-                title="Sign in with ChatGPT — opens a separate account workspace"
+                href="/signin"
+                target="_top"
+                title="Sign in with Google, opens a separate account workspace"
               >
                 <LogIn size={13} />
                 Sign in
@@ -317,7 +324,7 @@ export default function Home() {
             )}
           </div>
         </header>
-        <main id="main-content">
+        <main id="main-content" tabIndex={-1}>
           {error && (
             <div className="alert alert-error no-print" role="alert">
               <CircleHelp size={18} />
@@ -343,21 +350,32 @@ export default function Home() {
             <div className="guest-workspace-note no-print">
               <ShieldCheck size={13} />
               <span>
-                Private guest workspace. Signing in opens a separate account
-                workspace; guest data does not transfer. Download inventory and
-                decision receipts to keep this work.
+                Guest workspace. Google sign-in opens a separate account; guest
+                data does not transfer. Download inventory and receipts to keep
+                this work.
               </span>
             </div>
           )}
           {!workspace ? (
-            <div className="loading-state">
+            <div className="loading-state" role="status" aria-live="polite">
               <Disc3 className="spin" size={40} />
-              <h1>Opening the shop.</h1>
-              <p>Preparing your private workspace and sample stock.</p>
+              <h1>
+                {error ? "The shop couldn’t open yet." : "Opening the shop."}
+              </h1>
+              <p>
+                {error
+                  ? "Your connection or the service may be unavailable. Please try again."
+                  : "Preparing your private workspace and sample stock."}
+              </p>
               {error && (
                 <button
                   className="button primary"
-                  onClick={() => refresh().catch((e) => setError(e.message))}
+                  disabled={!!busy}
+                  onClick={() =>
+                    perform("retry", async () => {
+                      await refresh();
+                    })
+                  }
                 >
                   Try again
                 </button>
@@ -409,7 +427,11 @@ export default function Home() {
                       A HUMAN IDEA. AN AGENT’S LEGWORK.
                     </span>
                   </div>
-                  <section className="workbench no-print">
+                  <section
+                    className="workbench no-print"
+                    aria-label="Build a shop edit"
+                    aria-busy={busy === "agent"}
+                  >
                     <div className="audience-panel">
                       <div className="step-label">
                         <span>01</span> Start with their world
@@ -454,6 +476,8 @@ export default function Home() {
                             aria-label="Cultural anchor category"
                             value={kind}
                             onChange={(e) => {
+                              searchSerial.current++;
+                              setSearching(false);
                               setKind(e.target.value as EntityKind);
                               setMatches([]);
                               setSearched(false);
@@ -470,6 +494,9 @@ export default function Home() {
                           aria-label="Find a cultural anchor"
                           value={query}
                           onChange={(e) => {
+                            searchSerial.current++;
+                            setSearching(false);
+                            setMatches([]);
                             setQuery(e.target.value);
                             setSearched(false);
                           }}
@@ -495,8 +522,19 @@ export default function Home() {
                           )}
                         </button>
                       </form>
+                      <span className="sr-only" role="status">
+                        {searching
+                          ? "Searching Qloo."
+                          : searched
+                            ? `${matches.length} matching results. Select a result to add it to the audience.`
+                            : ""}
+                      </span>
                       {(matches.length > 0 || searched) && (
-                        <div className="search-results">
+                        <div
+                          className="search-results"
+                          role="region"
+                          aria-label="Qloo search results"
+                        >
                           {matches.length ? (
                             matches.map((entity) => (
                               <button
@@ -690,7 +728,7 @@ export default function Home() {
                           </>
                         )}
                       </button>
-                      <p className="run-note">
+                      <p className="run-note" role="status">
                         {busy === "agent"
                           ? "Resolving your stock, querying Qloo and checking every constraint. This may take a minute."
                           : !anchors.length
@@ -705,7 +743,7 @@ export default function Home() {
                         <span className="orange-spark">✳</span>
                         <strong>The connection is the point.</strong>
                         <p>
-                          “People who love this film might love this record” —
+                          “People who love this film might love this record,”
                           with Qloo evidence, stock checks, and a reason to
                           believe it.
                         </p>
@@ -1248,8 +1286,16 @@ export default function Home() {
                       e.target.value = "";
                     }}
                   />
-                  <div className="table-container">
+                  <div
+                    className="table-container"
+                    tabIndex={0}
+                    role="region"
+                    aria-label="Inventory records, scroll horizontally for all columns"
+                  >
                     <table>
+                      <caption className="sr-only">
+                        Your available stock, prices, margins and shelf age
+                      </caption>
                       <thead>
                         <tr>
                           <th>Record / artist</th>
@@ -1311,6 +1357,7 @@ export default function Home() {
                             <td>
                               <button
                                 className="text-button"
+                                aria-label={`Edit ${i.title} by ${i.artist}`}
                                 onClick={() => {
                                   setOriginalSku(i.sku);
                                   setError("");
@@ -1363,8 +1410,7 @@ export default function Home() {
                     </span>
                     <h1>Keep the good records moving.</h1>
                     <p>
-                      Your published edits and the customers coming to collect
-                      them.
+                      Your shop edits and the customers coming to collect them.
                     </p>
                   </div>
                   {!workspace.campaigns.length ? (
@@ -1482,8 +1528,16 @@ export default function Home() {
                           Refresh
                         </button>
                       </div>
-                      <div className="table-container">
+                      <div
+                        className="table-container"
+                        tabIndex={0}
+                        role="region"
+                        aria-label="Pickup holds, scroll horizontally for all columns"
+                      >
                         <table>
+                          <caption className="sr-only">
+                            Customer pickup holds and collection actions
+                          </caption>
                           <thead>
                             <tr>
                               <th>Customer / reference</th>
@@ -1518,6 +1572,7 @@ export default function Home() {
                                     <div className="row-actions">
                                       <button
                                         className="text-button"
+                                        aria-label={`Mark hold ${r.reference} collected`}
                                         disabled={!!busy}
                                         onClick={() =>
                                           perform("reservation", async () => {
@@ -1538,6 +1593,7 @@ export default function Home() {
                                       </button>
                                       <button
                                         className="text-button danger"
+                                        aria-label={`Cancel hold ${r.reference} and restore stock`}
                                         disabled={!!busy}
                                         onClick={() =>
                                           perform("reservation", async () => {
@@ -1649,7 +1705,7 @@ export default function Home() {
                     <h2>Technology that keeps the human taste.</h2>
                     <p>
                       Side B is designed for independent record retailers who
-                      have the expertise, the stock and the story — but little
+                      have the expertise, the stock and the story, but little
                       time to turn every cultural moment into a well-matched
                       shop edit.
                     </p>
@@ -1671,7 +1727,7 @@ export default function Home() {
         <div
           className="modal-backdrop"
           onClick={(e) => {
-            if (e.target === e.currentTarget) setEditing(null);
+            if (e.target === e.currentTarget && !busy) setEditing(null);
           }}
         >
           <section
@@ -1683,6 +1739,7 @@ export default function Home() {
             <button
               className="modal-close"
               aria-label="Close edit record"
+              disabled={!!busy}
               onClick={() => setEditing(null)}
             >
               <X size={20} />
@@ -1826,6 +1883,7 @@ export default function Home() {
             <button
               className="modal-close"
               aria-label="Close shop settings"
+              disabled={!!busy}
               onClick={() => setSettings(false)}
             >
               <X size={20} />
@@ -1887,21 +1945,20 @@ export default function Home() {
             </form>
             <div className="settings-privacy">
               <strong>Your workspace belongs to you.</strong>
+              {workspace.user && (
+                <a className="button secondary account-signout" href="/signout">
+                  Sign out
+                </a>
+              )}
               <p>
                 {workspace.user
                   ? "Signed in and saved to your account."
                   : "Your private guest workspace uses this browser’s cookie. Signing in opens a separate account workspace; guest data is not transferred. Sign in before uploading stock you need across devices."}
               </p>
-              {workspace.user && (
-                <a className="button secondary" href="/signout-with-chatgpt?return_to=/" target="_top">Sign out of Side B</a>
-              )}
               {!workspace.user && (
-                <a
-                  className="button secondary"
-                  href="/signin-with-chatgpt?return_to=/" target="_top"
-                >
+                <a className="button secondary" href="/signin" target="_top">
                   <LogIn size={15} />
-                  Sign in with ChatGPT
+                  Sign in with Google
                 </a>
               )}
               <button
