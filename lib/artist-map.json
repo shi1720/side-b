@@ -1,0 +1,82 @@
+{
+  "radiohead": {
+    "id": "70CAE5BF-2F4C-445C-A3E5-4EDACFC3591C",
+    "name": "Radiohead"
+  },
+  "khruangbin": {
+    "id": "BAF6317A-DF94-4C90-92AE-63F86560C21B",
+    "name": "Khruangbin"
+  },
+  "nujabes": {
+    "id": "E11125AF-936B-4935-B607-F2DA2E6A6B92",
+    "name": "Nujabes"
+  },
+  "sade": {
+    "id": "65726539-EA36-4283-914C-6EC71001F1F1",
+    "name": "Sade"
+  },
+  "bonobo": {
+    "id": "5861FE97-122C-4A14-B5A6-0150B105D45F",
+    "name": "Bonobo"
+  },
+  "massiveattack": {
+    "id": "E57B2F09-8078-4EDE-BEC0-4B02794A8D9E",
+    "name": "Massive Attack"
+  },
+  "portishead": {
+    "id": "045707A1-C8EF-443F-A882-1B97AC69DC9A",
+    "name": "Portishead"
+  },
+  "nickdrake": {
+    "id": "9FDC44C4-D40D-484C-AAAC-88E1C2B13998",
+    "name": "Nick Drake"
+  },
+  "jdilla": {
+    "id": "3DBA6EDB-D710-4908-8AC7-47FE6505382A",
+    "name": "J Dilla"
+  },
+  "fleetwoodmac": {
+    "id": "B1414851-6A23-4C52-B647-2A0249B664F9",
+    "name": "Fleetwood Mac"
+  },
+  "aphextwin": {
+    "id": "4278382F-4991-4D63-B207-942D86A26ACB",
+    "name": "Aphex Twin"
+  },
+  "beachhouse": {
+    "id": "3460E83E-DCD5-4D1B-B3BF-1B6C1D6D2BB8",
+    "name": "Beach House"
+  },
+  "japanesebreakfast": {
+    "id": "AA21934D-3A6E-4973-983F-28604C44E3AC",
+    "name": "Japanese Breakfast"
+  },
+  "tylerthecreator": {
+    "id": "375758AA-B0FA-4508-8EC1-D7FBFE3A4B3C",
+    "name": "Tyler, the Creator"
+  },
+  "cocteautwins": {
+    "id": "973FE25D-D742-405B-9878-C4648CD96125",
+    "name": "Cocteau Twins"
+  },
+  "talkingheads": {
+    "id": "1A758B66-ED5E-4DB7-A8FF-FE4EFA06001B",
+    "name": "Talking Heads"
+  },
+  "brianeno": {
+    "id": "1B088E28-0668-4670-A97B-87865A1FCBCF",
+    "name": "Brian Eno"
+  },
+  "mfdoom": {
+    "id": "2526A0E0-BCB7-4DE5-AE85-5FBAB14CC246",
+    "name": "MF DOOM"
+  },
+  "milesdavis": {
+    "id": "578CFC26-B696-449A-9655-3FB270DDA725",
+    "name": "Miles Davis"
+  },
+  "abba": {
+    "id": "6EFDAE6B-574F-4EAA-930A-09C61C80E453",
+    "name": "ABBA"
+  }
+}

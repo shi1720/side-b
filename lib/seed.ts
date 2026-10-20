@@ -1,0 +1,24 @@
+import type { InventoryItem } from './types';
+/** Real releases; fictional stock, age and costs. Artist IDs must be resolved by Qloo. */
+export const SAMPLE_INVENTORY: InventoryItem[] = [
+  ['SB01','Radiohead','In Rainbows',32,20,4,124,'Alternative','#eb6d35'],
+  ['SB02','Khruangbin','Con Todo El Mundo',29,17,5,180,'Psychedelic soul','#e0a84c'],
+  ['SB03','Nujabes','Modal Soul',42,26,3,210,'Instrumental hip-hop','#bd795b'],
+  ['SB04','Sade','Love Deluxe',30,18,4,92,'Soul','#966453'],
+  ['SB05','Bonobo','Black Sands',28,16,6,240,'Downtempo','#899c81'],
+  ['SB06','Massive Attack','Mezzanine',36,22,3,160,'Trip-hop','#303d3b'],
+  ['SB07','Portishead','Dummy',31,18,5,200,'Trip-hop','#4f7990'],
+  ['SB08','Nick Drake','Pink Moon',27,15,3,270,'Folk','#c691a6'],
+  ['SB09','J Dilla','Donuts',33,20,4,140,'Hip-hop','#c5a381'],
+  ['SB10','Fleetwood Mac','Rumours',29,19,6,34,'Classic rock','#b8b0a0'],
+  ['SB11','Aphex Twin','Selected Ambient Works 85–92',35,21,3,195,'Ambient techno','#7e8480'],
+  ['SB12','Beach House','Bloom',28,17,5,155,'Dream pop','#8a6380'],
+  ['SB13','Japanese Breakfast','Jubilee',27,16,4,120,'Indie pop','#d0b13e'],
+  ['SB14','Tyler, the Creator','IGOR',34,22,5,45,'Hip-hop','#cf8ba1'],
+  ['SB15','Cocteau Twins','Heaven or Las Vegas',30,18,3,225,'Dream pop','#bf714b'],
+  ['SB16','Talking Heads','Remain in Light',28,17,4,105,'Art rock','#ba5149'],
+  ['SB17','Brian Eno','Ambient 1: Music for Airports',29,17,4,290,'Ambient','#a9b9ac'],
+  ['SB18','Madvillain','Madvillainy',34,20,3,175,'Hip-hop','#888579'],
+  ['SB19','Miles Davis','Kind of Blue',26,15,5,75,'Jazz','#527da1'],
+  ['SB20','ABBA','Gold: Greatest Hits',32,20,4,60,'Pop','#c4a74a'],
+].map(([sku,artist,title,price,cost,quantity,daysOnShelf,genre,color]) => ({ sku,artist,title,price,cost,quantity,daysOnShelf,genre,color }) as InventoryItem);
